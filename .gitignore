@@ -1,0 +1,87 @@
+# =====================================
+# API KEYS AND PRIVATE CREDENTIALS
+# =====================================
+.env
+.env.*
+!.env.example
+sample.env
+credentials/
+*.pem
+*service-account*.json
+*credentials*.json
+
+
+# =====================================
+# PYTHON VIRTUAL ENVIRONMENT
+# =====================================
+.venv/
+venv/
+env/
+
+
+# =====================================
+# PYTHON CACHE FILES
+# =====================================
+__pycache__/
+*.py[cod]
+*$py.class
+
+
+# =====================================
+# LOGS AND TEMPORARY FILES
+# =====================================
+*.log
+.gradio/
+temp/
+tmp/
+
+
+# =====================================
+# EXPERIMENTAL OCR AND PRESCRIPTION FILES
+# =====================================
+prescription/
+
+
+# =====================================
+# GENERATED AUDIO AND VIDEO FILES
+# =====================================
+*.mp3
+*.wav
+*.mp4
+*.mov
+
+
+# =====================================
+# PRIVATE SAMPLE IMAGES
+# =====================================
+sample-image.png
+
+
+# =====================================
+# GENERATED TEMPORARY MEDIA
+# =====================================
+*.tmp
+*.bak
+
+
+# =====================================
+# LOCAL INTEGRATION AND DEBUGGING SCRIPTS
+# =====================================
+test_*.py
+
+
+# =====================================
+# OPTIONAL AND UNUSED EXPERIMENTAL MODULES
+# =====================================
+config.py
+brain_of_the_doctor.py
+free_text_to_speech.py
+
+
+# =====================================
+# IDE AND OPERATING SYSTEM FILES
+# =====================================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

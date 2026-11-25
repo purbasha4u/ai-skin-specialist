@@ -1,20 +1,25 @@
 [project]
 name = "ai-skin-specialist"
 version = "0.1.0"
-description = "Add your description here"
+description = "AI-powered skin-care consultation assistant using voice, image, and video analysis."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "anthropic>=0.116.0",
     "deepgram-sdk>=7.4.0",
+    "google-cloud-vision>=3.15.0",
     "gradio>=6.19.0",
     "groq>=1.5.0",
     "gtts>=2.5.4",
+    "mistralai>=2.9.4",
     "numpy>=2.4.6",
+    "opencv-python-headless>=5.1.0.95",
     "path>=17.1.1",
     "pillow>=12.3.0",
     "pyaudio>=0.2.14",
     "pydub>=0.25.1",
+    "pymupdf>=1.28.2",
+    "pytesseract>=0.3.13",
     "python-dotenv>=1.2.2",
     "sounddevice>=0.5.5",
     "speechrecognition>=3.17.0",

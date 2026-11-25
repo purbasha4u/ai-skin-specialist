@@ -2,13 +2,25 @@ from pathlib import Path
 
 import gradio as gr
 
-#from brain_of_the_doctor import brain_of_the_doctor
+from app_logging import get_logger, configure_logging
+from media_validation import (
+    validate_audio_path,
+    validate_image_path,
+    validate_video_path,
+)
 from brain_of_the_doctor_groq import brain_of_the_doctor
 from voice_of_the_doctor import convert_text_to_doctor_audio
 from voice_of_the_patient import transcribe_patient_voice
 
 
+_logger = get_logger("main")
+
 APP_TITLE = "AI Skin Specialist"
+
+
+# ---------------------------------------------------------------------------
+# CSS theme
+# ---------------------------------------------------------------------------
 
 CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -453,26 +465,213 @@ CSS = """
 """
 
 
+# ---------------------------------------------------------------------------
+# Main processing function
+# ---------------------------------------------------------------------------
+
 def process_inputs(audio_filepath, image_filepath, video_filepath):
+    """
+    Validate inputs and run the complete analysis pipeline.
+
+    Workflow:
+    1. Validate patient audio.
+    2. Validate uploaded image and video independently.
+    3. Transcribe patient voice using Groq Whisper.
+    4. Analyse image and extracted video frames using Groq Vision.
+    5. Generate doctor voice response using Deepgram.
+    """
+
+    # Step 1: Check required inputs.
+
     if not audio_filepath:
-        raise gr.Error("Please record or upload your voice description first.")
+        raise gr.Error(
+            "Please record or upload your voice description first."
+        )
 
     if not image_filepath and not video_filepath:
-        raise gr.Error("Please upload a skin image or video before analysis.")
+        raise gr.Error(
+            "Please upload a skin image or video before analysis."
+        )
 
-    patient_text = transcribe_patient_voice(audio_filepath)
-    doctor_text = brain_of_the_doctor(
-        patient_text=patient_text,
-        image_filepath=image_filepath,
-        video_filepath=video_filepath,
+    _logger.info(
+        "Starting analysis with audio=%s, image=%s, video=%s",
+        bool(audio_filepath),
+        bool(image_filepath),
+        bool(video_filepath),
     )
-    doctor_audio = convert_text_to_doctor_audio(doctor_text)
 
-    return patient_text, doctor_text, str(Path(doctor_audio))
+    # Step 2: Validate audio.
 
+    try:
+        patient_audio_path = validate_audio_path(
+            audio_filepath
+        )
+
+        _logger.info(
+            "Audio input validated: %s",
+            patient_audio_path.name
+        )
+
+    except ValueError as exc:
+        raise gr.Error(str(exc)) from None
+
+    except Exception as exc:
+        _logger.warning(
+            "Audio validation unexpected error: %s",
+            type(exc).__name__
+        )
+
+        raise gr.Error(
+            "There was a problem checking your voice input. "
+            "Please try again."
+        ) from None
+
+    # Step 3: Validate image and video independently.
+
+    image_path = None
+    video_path = None
+
+    try:
+
+        if image_filepath:
+            image_path = validate_image_path(
+                image_filepath
+            )
+
+            _logger.info(
+                "Image input validated: %s",
+                image_path.name
+            )
+
+        if video_filepath:
+            video_path = validate_video_path(
+                video_filepath
+            )
+
+            _logger.info(
+                "Video input validated: %s",
+                video_path.name
+            )
+
+    except ValueError as exc:
+        raise gr.Error(str(exc)) from None
+
+    except Exception as exc:
+        _logger.warning(
+            "Image/video validation unexpected error: %s",
+            type(exc).__name__
+        )
+
+        raise gr.Error(
+            "There was a problem checking your image or video input. "
+            "Please try again."
+        ) from None
+
+    # Step 4: Transcribe patient voice.
+
+    try:
+
+        patient_text = transcribe_patient_voice(
+            str(patient_audio_path)
+        )
+
+        _logger.info(
+            "Patient voice transcription completed"
+        )
+
+    except ValueError as exc:
+        raise gr.Error(str(exc)) from None
+
+    except Exception as exc:
+        _logger.warning(
+            "Unexpected transcription error: %s",
+            type(exc).__name__
+        )
+
+        raise gr.Error(
+            "There was an unexpected problem transcribing your voice. "
+            "Please try again."
+        ) from None
+
+    # Step 5: Analyse image and video.
+
+    try:
+
+        doctor_text = brain_of_the_doctor(
+            patient_text=patient_text,
+            image_filepath=(
+                str(image_path) if image_path else None
+            ),
+            video_filepath=(
+                str(video_path) if video_path else None
+            ),
+        )
+
+        _logger.info(
+            "Image/video analysis completed"
+        )
+
+    except ValueError as exc:
+        raise gr.Error(str(exc)) from None
+
+    except Exception as exc:
+        _logger.warning(
+            "Unexpected vision/LLM error: %s",
+            type(exc).__name__
+        )
+
+        raise gr.Error(
+            "There was an unexpected problem analyzing the image or video. "
+            "Please try again."
+        ) from None
+
+    # Step 6: Generate doctor's voice response.
+
+    try:
+
+        doctor_audio = convert_text_to_doctor_audio(
+            doctor_text
+        )
+
+        _logger.info(
+            "Doctor voice response generated"
+        )
+
+    except ValueError as exc:
+        raise gr.Error(str(exc)) from None
+
+    except Exception as exc:
+        _logger.warning(
+            "Unexpected TTS error: %s",
+            type(exc).__name__
+        )
+
+        raise gr.Error(
+            "There was an unexpected problem creating the doctor's "
+            "audio response. Please try again."
+        ) from None
+
+    # Step 7: Return results to Gradio.
+
+    _logger.info(
+        "Analysis completed successfully"
+    )
+
+    return (
+        patient_text,
+        doctor_text,
+        str(Path(doctor_audio)),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Gradio interface
+# ---------------------------------------------------------------------------
 
 with gr.Blocks(title=APP_TITLE) as iface:
+
     with gr.Column(elem_classes="ais-shell"):
+
         gr.HTML(
             """
             <header class="ais-topbar">
@@ -489,7 +688,13 @@ with gr.Blocks(title=APP_TITLE) as iface:
         )
 
         with gr.Row(elem_classes="ais-grid"):
+
+            # ---------------------------------------------------------------
+            # Patient input section
+            # ---------------------------------------------------------------
+
             with gr.Column(scale=5):
+
                 gr.HTML(
                     """
                     <div class="ais-section-title">
@@ -499,23 +704,41 @@ with gr.Blocks(title=APP_TITLE) as iface:
                     """
                 )
 
-                with gr.Column(elem_classes="ais-card ais-input-card"):
-                    gr.HTML('<span class="ais-field-label">Describe your skin concern</span>')
+                with gr.Column(
+                    elem_classes="ais-card ais-input-card"
+                ):
+
+                    gr.HTML(
+                        '<span class="ais-field-label">'
+                        'Describe your skin concern'
+                        '</span>'
+                    )
+
                     audio_input = gr.Audio(
                         sources=["microphone", "upload"],
                         type="filepath",
                         label="Patient Voice",
                     )
 
-                    with gr.Row(elem_classes="ais-media-row"):
+                    with gr.Row(
+                        elem_classes="ais-media-row"
+                    ):
+
                         image_input = gr.Image(
                             type="filepath",
                             label="Skin Image",
                             height=280,
                         )
-                        video_input = gr.Video(label="Skin Video", height=280)
 
-                    with gr.Column(elem_classes="ais-submit-wrap"):
+                        video_input = gr.Video(
+                            label="Skin Video",
+                            height=280,
+                        )
+
+                    with gr.Column(
+                        elem_classes="ais-submit-wrap"
+                    ):
+
                         analyze_button = gr.Button(
                             "Analyze Concern",
                             variant="primary",
@@ -526,12 +749,21 @@ with gr.Blocks(title=APP_TITLE) as iface:
                         """
                         <div class="ais-note">
                             <span class="ais-icon">info</span>
-                            <span>For better assessment, include a short video showing the affected area from multiple angles and under good lighting.</span>
+                            <span>
+                                For better assessment, include a short video
+                                showing the affected area from multiple angles
+                                and under good lighting.
+                            </span>
                         </div>
                         """
                     )
 
+            # ---------------------------------------------------------------
+            # Doctor response section
+            # ---------------------------------------------------------------
+
             with gr.Column(scale=7):
+
                 gr.HTML(
                     """
                     <div class="ais-section-title">
@@ -541,31 +773,42 @@ with gr.Blocks(title=APP_TITLE) as iface:
                     """
                 )
 
-                with gr.Column(elem_classes="ais-card ais-response-card"):
+                with gr.Column(
+                    elem_classes="ais-card ais-response-card"
+                ):
+
                     gr.HTML(
                         """
                         <div class="ais-empty">
                             <span class="ais-icon">pending_actions</span>
                             <div>
                                 <strong>Ready for Analysis</strong>
-                                <p class="ais-panel-copy">Your consultation summary, transcript, and guidance will appear below after analysis.</p>
+                                <p class="ais-panel-copy">
+                                    Your consultation summary, transcript,
+                                    and guidance will appear below after analysis.
+                                </p>
                             </div>
                         </div>
                         """
                     )
 
-                    with gr.Column(elem_classes="ais-output-stack"):
+                    with gr.Column(
+                        elem_classes="ais-output-stack"
+                    ):
+
                         transcript_output = gr.Textbox(
                             label="Your Speech Transcript",
                             lines=4,
                             interactive=False,
                             elem_classes="ais-transcript",
                         )
+
                         response_output = gr.Textbox(
                             label="Doctor's Guidance",
                             lines=9,
                             interactive=False,
                         )
+
                         audio_output = gr.Audio(
                             label="Doctor Voice Response",
                             type="filepath",
@@ -575,28 +818,68 @@ with gr.Blocks(title=APP_TITLE) as iface:
 
                 gr.HTML(
                     """
-                    <div class="ais-security" style="justify-content:center; margin-top:16px;">
+                    <div class="ais-security"
+                         style="justify-content:center; margin-top:16px;">
                         <span class="ais-icon">verified</span>
-                        <span>AI guidance is informational and not a medical diagnosis</span>
+                        <span>
+                            AI guidance is informational and not a medical diagnosis
+                        </span>
                     </div>
                     """
                 )
 
+        # -------------------------------------------------------------------
+        # Footer
+        # -------------------------------------------------------------------
+
         gr.HTML(
             """
             <footer class="ais-footer">
-                <div><strong>AI Skin Specialist</strong><br/>Consult a licensed dermatologist for urgent or serious symptoms.</div>
-                <div>Privacy Policy · Terms of Service · Medical Disclaimer</div>
+                <div>
+                    <strong>AI Skin Specialist</strong><br/>
+                    Consult a licensed dermatologist for urgent or serious symptoms.
+                </div>
+                <div>
+                    Privacy Policy · Terms of Service · Medical Disclaimer
+                </div>
             </footer>
             """
         )
 
+    # -----------------------------------------------------------------------
+    # Button event
+    # -----------------------------------------------------------------------
+
     analyze_button.click(
         fn=process_inputs,
-        inputs=[audio_input, image_input, video_input],
-        outputs=[transcript_output, response_output, audio_output],
+        inputs=[
+            audio_input,
+            image_input,
+            video_input,
+        ],
+        outputs=[
+            transcript_output,
+            response_output,
+            audio_output,
+        ],
     )
 
 
+# ---------------------------------------------------------------------------
+# Application launch
+# ---------------------------------------------------------------------------
+
 if __name__ == "__main__":
-    iface.launch(debug=True, css=CSS, theme=gr.themes.Base())
+
+    print("========== MY UPDATED CODE ==========")
+
+    configure_logging()
+
+    iface.launch(
+        server_name="0.0.0.0",
+        server_port=7861,
+        debug=True,
+        share=True,
+        css=CSS,
+        theme=gr.themes.Base(),
+    )
