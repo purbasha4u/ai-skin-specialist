@@ -1,159 +1,154 @@
-# AI Skin Specialist 🩺
+# 🩺 AI Skin Specialist
 
-An AI-powered skin consultation assistant that allows users to describe their skin concerns through voice input and provide skin images or videos for AI-assisted analysis. The application processes the patient's input and generates written guidance along with an audio response.
+### AI-Powered Skin Consultation Assistant Using Voice, Images, and Video
 
-Built using **Python, Gradio, Groq AI, Whisper, and Deepgram**.
+AI Skin Specialist is an AI-powered web application designed to help users understand skin-related concerns through voice descriptions, skin images, and video input.
 
-> **Disclaimer:** This application provides informational AI-generated guidance only. It is not a substitute for professional medical advice, diagnosis, or treatment.
-
----
-
-## ✨ Features
-
-- **Voice Input:** Users can describe their skin concerns using a microphone or an audio file.
-- **Speech-to-Text:** Converts patient voice input into text using Groq Whisper.
-- **Image Analysis:** Processes skin images using a Groq vision model.
-- **Video Analysis:** Extracts video frames for visual analysis.
-- **Combined Input:** Supports image-only, video-only, or image-and-video input.
-- **AI-Powered Guidance:** Generates responses based on the patient's description and available visual information.
-- **Text-to-Speech:** Converts AI-generated guidance into audio using Deepgram.
-- **Interactive Interface:** Provides a user-friendly interface built with Gradio.
-- **Centralized Logging:** Uses a dedicated logging module to manage application logs.
-- **Media Validation:** Validates uploaded audio, image, and video inputs before processing.
+The application combines artificial intelligence, computer vision, speech recognition, and text-to-speech technology to provide an interactive skin consultation experience.
 
 ---
 
-## 🛠️ Tech Stack
+## 🌐 Live Demo
+
+Try the deployed application:
+
+### 🚀 [AI Skin Specialist – Open Live Website](https://ai-skin-specialist-30cg.onrender.com)
+
+**Hosting Platform:** Render  
+**Deployment Status:** Live
+
+---
+
+##  Application Preview
+
+### Main Application Interface
+
+![AI Skin Specialist Interface](screenshots/homepage.png)
+
+### AI Consultation and Doctor Response
+
+![AI Skin Specialist Analysis](screenshots/analysis.png)
+
+---
+
+##  Key Features
+
+- **🎙️ Patient Voice Input:** Record or upload voice descriptions of skin-related concerns.
+- **🖼️ Skin Image Analysis:** Upload skin images for AI-powered visual analysis.
+- **🎥 Skin Video Analysis:** Provide videos to give additional visual context.
+- **📝 Speech-to-Text:** Convert patient voice recordings into text using Groq Whisper.
+- **🤖 AI-Powered Analysis:** Generate contextual responses using Groq AI models.
+- **🔊 Doctor Voice Response:** Convert the generated text response into spoken audio using Deepgram TTS.
+- **💻 Interactive Web Interface:** Simple and responsive interface built with Gradio.
+- **🔐 API Key Management:** Keep API credentials separate from application source code using environment variables.
+
+---
+
+##  Technology Stack
 
 | Technology | Purpose |
 |---|---|
 | Python | Core programming language |
-| Gradio | Interactive web interface |
+| Gradio | Web application interface |
 | Groq API | AI-powered processing |
-| Groq Whisper | Voice transcription |
-| Groq Vision Model | Image and video analysis |
+| Groq Whisper | Speech-to-text transcription |
 | Deepgram API | Text-to-speech generation |
+| OpenCV | Video processing |
+| NumPy | Numerical operations |
 | Pillow | Image processing |
-| OpenCV | Video frame processing |
 | python-dotenv | Environment variable management |
-| uv | Python package and project management |
+| uv | Python package and dependency management |
+| Render | Cloud hosting and deployment |
+| Git & GitHub | Version control and source code management |
 
 ---
 
-## 📂 Project Structure
+##  Project Structure
 
 ```text
 ai-skin-specialist/
 │
 ├── main.py
+│
 ├── app_logging.py
-├── media_validation.py
 │
 ├── brain_of_the_doctor_groq.py
+│
 ├── voice_of_the_patient.py
+│
 ├── voice_of_the_doctor.py
 │
-├── stitch_ai_skin_specialist_dashboard/
-│   ├── code.html
-│   ├── DESIGN.md
-│   └── screen.png
+├── media_validation.py
 │
-├── .env.example
-├── .gitignore
+├── doctor_response.mp3
+│
 ├── pyproject.toml
+│
 ├── uv.lock
-└── README.md
+│
+├── README.md
+│
+├── .gitignore
+│
+└── .env
 ```
 
-### Important Files
-
-- **`main.py`** — Main Gradio application and processing workflow.
-- **`brain_of_the_doctor_groq.py`** — Handles AI-based image/video analysis and response generation using Groq.
-- **`voice_of_the_patient.py`** — Handles patient audio transcription using Groq Whisper.
-- **`voice_of_the_doctor.py`** — Converts generated text responses into speech using Deepgram.
-- **`media_validation.py`** — Validates audio, image, and video inputs.
-- **`app_logging.py`** — Provides centralized application logging.
-- **`stitch_ai_skin_specialist_dashboard/`** — Separate dashboard design prototype, not integrated into the default Gradio application.
+**Note:** The `.env` file contains private API credentials and must never be uploaded to GitHub.
 
 ---
 
-## ⚙️ Requirements
+##  Requirements
 
-Before running the project, make sure you have:
+Before running the project locally, make sure you have:
 
-- Python 3.11 or newer
-- uv package manager
-- Groq API key
-- Deepgram API key
-- Internet connection
+- Python 3.12 or newer compatible with the project dependencies.
+- uv package manager.
+- Git.
+- A Groq API key.
+- A Deepgram API key.
 
 ---
 
-## 🚀 Installation and Setup
+##  Installation and Setup
 
 ### 1. Clone the Repository
 
 ```bash
-git clone YOUR_REPOSITORY_URL
+git clone https://github.com/purbasha4u/ai-skin-specialist.git
 ```
 
-Navigate into the project directory:
+### 2. Navigate to the Project Directory
 
 ```bash
 cd ai-skin-specialist
 ```
 
-### 2. Install Dependencies
+### 3. Install Dependencies
 
-Install the project dependencies using uv:
+Install the required dependencies using uv:
 
 ```bash
 uv sync
 ```
 
-### 3. Configure Environment Variables
+This command creates the virtual environment and installs the packages specified in `pyproject.toml` and `uv.lock`.
 
-Create a `.env` file from the provided example.
+### 4. Configure Environment Variables
 
-**Windows PowerShell:**
+Create a `.env` file in the project's root directory.
 
-```powershell
-Copy-Item .env.example .env
-```
-
-**Linux / macOS:**
-
-```bash
-cp .env.example .env
-```
-
-Open the `.env` file and add your API keys:
+Add the following variables:
 
 ```env
-# Required API Keys
-GROQ_API_KEY=your_groq_api_key_here
-DEEPGRAM_API_KEY=your_deepgram_api_key_here
-
-# Optional Model Configuration
-WHISPER_MODEL=whisper-large-v3
-GROQ_MODEL=qwen/qwen3.8-27b
-DEEPGRAM_TTS_MODEL=aura-2-thalia-en
-
-# Optional: Only for the alternative MiniMax implementation
-MINIMAX_API_KEY=
-MINIMAX_BASE_URL=https://api.minimax.io/anthropic
-MINIMAX_MODEL=MiniMax-M3
+GROQ_API_KEY=your_groq_api_key
+DEEPGRAM_API_KEY=your_deepgram_api_key
 ```
 
-**Note:**
-- `GROQ_API_KEY` and `DEEPGRAM_API_KEY` are required for the default application workflow.
-- Model configuration variables are optional.
-- MiniMax variables are retained for optional configuration compatibility; the default application does not use the alternative MiniMax implementation.
-- Never upload your actual `.env` file or expose API keys publicly.
+Replace the placeholder values with your actual API credentials.
 
----
+**Important:** Never share your API keys or commit your `.env` file to GitHub.
 
-## ▶️ Run the Application
+### 5. Run the Application
 
 Start the application using:
 
@@ -161,123 +156,163 @@ Start the application using:
 uv run python main.py
 ```
 
-Once the application starts, open the following address in your browser:
+Open your browser and visit:
 
 ```text
 http://127.0.0.1:7861
 ```
 
-You can now interact with the AI Skin Specialist application.
-
 ---
 
-## 🔄 Application Workflow
+##  Application Workflow
 
-The application follows this workflow:
+The application follows this general workflow:
 
 ```text
-       Patient Input
-             |
-     +-------+-------+
-     |       |       |
-   Voice   Image   Video
-     |       |       |
-     v       |       |
- Groq Whisper |       |
-     |       |       |
-     v       v       v
-  Transcribed  Visual Processing
-     Text          |
-        \          /
-         \        /
-          v      v
-       Groq AI Model
-             |
-             v
-    AI-Generated Guidance
-             |
-       +-----+-----+
-       |           |
-       v           v
-   Text Output  Deepgram TTS
-                   |
-                   v
-               Audio Output
+        Patient Input
+              |
+     ---------------------
+     |         |         |
+   Voice     Image     Video
+     |         |         |
+     v         v         v
+  Whisper   Image      Video
+ Transcription Analysis Processing
+     |         |         |
+     --------- | ---------
+               |
+               v
+        AI Processing
+          (Groq API)
+               |
+               v
+       Doctor's Guidance
+               |
+          -------------
+          |           |
+          v           v
+      Text Output   Deepgram TTS
+                        |
+                        v
+                  Voice Response
 ```
 
-### Processing Steps
+### Workflow Explanation
 
-1. The patient provides a voice description of their skin concern.
-2. Groq Whisper converts the voice input into text.
-3. The patient can provide a skin image, video, or both.
-4. The application processes the available visual input.
-5. The transcribed text and visual information are passed to the Groq AI model.
-6. The AI generates informational guidance based on the provided information.
-7. The generated response is displayed as text.
-8. Deepgram converts the response into audio.
-
-### Image and Video Support
-
-The application supports three input combinations:
-
-- Image only
-- Video only
-- Image and video together
-
-For video processing, the application extracts up to three frames for visual analysis. When an image is also supplied, it processes the image along with up to two video frames.
+1. The patient provides a voice description, skin image, or video.
+2. The voice recording is converted into text using Groq Whisper.
+3. Image and video inputs are processed to extract relevant visual information.
+4. The collected information is sent to the AI model through Groq.
+5. The application generates a contextual response.
+6. Deepgram converts the generated response into spoken audio.
+7. The results are displayed in the Gradio interface.
 
 ---
 
-## 🔐 Security and Privacy
+##  Deployment
 
-The project follows basic security practices:
+The application is deployed on **Render** as a Python Web Service.
 
-- API keys are stored in environment variables.
-- The `.env` file is excluded from Git using `.gitignore`.
-- `.env.example` contains placeholder values for configuration.
-- Uploaded media is validated before processing.
-- Application logging is centralized.
+### Live Application
 
-**Important:** Avoid uploading sensitive personal or medical information unless you understand how the application and its external AI services process that information. Do not assume that uploaded media or API requests are automatically private.
+[https://ai-skin-specialist-30cg.onrender.com](https://ai-skin-specialist-30cg.onrender.com)
+
+### Deployment Configuration
+
+| Configuration | Value |
+|---|---|
+| Hosting Platform | Render |
+| Service Type | Web Service |
+| Runtime | Python 3.12 |
+| Framework | Gradio |
+| Package Manager | uv |
+| Deployment Branch | main |
+| Instance Plan | Free |
+
+### Build Command
+
+```bash
+uv sync --frozen && uv cache prune --ci
+```
+
+### Start Command
+
+```bash
+python main.py
+```
+
+### Environment Variables
+
+Configure the following variables in Render:
+
+```text
+GROQ_API_KEY
+DEEPGRAM_API_KEY
+PYTHON_VERSION
+```
+
+Never store API credentials directly in the source code or public repository.
 
 ---
 
-## ⚠️ Medical Disclaimer
+##  Security and Privacy
+
+The application uses environment variables to manage API credentials.
+
+Important security practices:
+
+- Keep API keys in a local `.env` file.
+- Add `.env` to `.gitignore`.
+- Configure production API keys through Render Environment Variables.
+- Never publish API credentials in source code, screenshots, or documentation.
+- Avoid uploading sensitive personal information.
+
+Voice recordings, images, and videos may be processed by external AI service providers. Users should review the relevant providers' privacy policies before submitting personal information.
+
+---
+
+##  Medical Disclaimer
 
 AI Skin Specialist is an experimental AI-powered informational assistant.
 
-- It does not provide a confirmed medical diagnosis.
-- AI-generated responses may be incomplete or inaccurate.
-- Visual analysis cannot replace a professional skin examination.
-- Users should consult a qualified healthcare professional for medical concerns.
-- Do not use the application to make medication or treatment decisions without professional advice.
+The generated responses are intended for educational and informational purposes only.
+
+This application does not provide professional medical diagnosis, treatment, or prescriptions.
+
+AI-generated results may be inaccurate or incomplete. Users should consult a qualified dermatologist or healthcare professional for proper medical evaluation and treatment.
 
 ---
 
-## 🔮 Future Improvements
+##  Future Improvements
 
-Potential future improvements include:
-
-- Improved skin image analysis.
-- More accurate voice interaction.
-- Better multilingual support.
-- Enhanced user interface.
-- Improved video processing.
-- Consultation history and report generation.
-- Additional AI model integrations.
+- Improve skin image analysis accuracy.
+- Add multilingual voice interaction.
+- Improve video-based skin analysis.
+- Introduce consultation history.
+- Enhance the user interface and experience.
+- Add secure user authentication.
+- Improve application performance and scalability.
 
 ---
 
-## 👨‍💻 Author
+##  Authors
 
-**Bikram Das|Purbasha Ram**
+**Bikram Das & Purbasha Ram**
 
-AI Skin Specialist — An AI-powered skin consultation assistant built using Python and modern AI technologies.
+Developed as an AI-powered application combining artificial intelligence, computer vision, speech recognition, and modern web technologies.
 
 ---
 
-## ⭐ Support
+##  Support
 
-If you find this project interesting or useful, consider giving the repository a star ⭐ on GitHub.
+If you find this project interesting, consider giving the repository a ⭐ on GitHub.
 
-Contributions, suggestions, and feedback are welcome!
+**GitHub Repository:**  
+https://github.com/purbasha4u/ai-skin-specialist
+
+**Live Demo:**  
+https://ai-skin-specialist-30cg.onrender.com
+
+---
+
+*Built with Python, AI, and a passion for innovation.* 🚀
