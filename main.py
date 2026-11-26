@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import gradio as gr
@@ -871,15 +872,19 @@ with gr.Blocks(title=APP_TITLE) as iface:
 
 if __name__ == "__main__":
 
-    print("========== MY UPDATED CODE ==========")
+    print("========== AI SKIN SPECIALIST ==========")
 
     configure_logging()
 
+    # Use Render's assigned port.
+    # Use port 7861 when running locally.
+    PORT = int(os.environ.get("PORT", 7861))
+
     iface.launch(
         server_name="0.0.0.0",
-        server_port=7861,
-        debug=True,
-        share=True,
+        server_port=PORT,
+        debug=False,
+        share=False,
         css=CSS,
         theme=gr.themes.Base(),
     )
